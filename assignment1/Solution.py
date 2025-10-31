@@ -34,20 +34,66 @@ def generate_password(lenght = 8):
 
     return ''.join(password)
 
-def main():
-    while True:
+def create_gui():
+    import tkinter as tk
+    from tkinter import ttk, messagebox
 
+    def generate():
         try:
-            length = int(input("Enter desired password length (8-16): "))
+            length = int(length_var.get())
             if 8 <= length <= 16:
-                break
+                password = generate_password(length)
+                password_var.set(password)
             else:
-                print("Length must be between 8 and 16 characters.")
+                messagebox.showerror("Error", "Length must be between 8 and 16 characters.")
         except ValueError:
-            print("Invalid input. Please enter a number.")
+            messagebox.showerror("Error", "Please enter a valid number.")
 
-    password = generate_password(length)
-    print(f"Generated password: {password}")
+    def copy_to_clipboard():
+        if password_var.get():
+            root.clipboard_clear()
+            root.clipboard_append(password_var.get())
+            messagebox.showinfo("Success", "Password copied to clipboard!")
+
+    # Create the main window
+    root = tk.Tk()
+    root.title("Password Generator")
+    root.geometry("400x250")
+    root.resizable(False, False)
+
+    # Style configuration
+    style = ttk.Style()
+    style.configure('TButton', padding=5)
+    style.configure('TLabel', font=('Helvetica', 10))
+    style.configure('TEntry', padding=5)
+
+    # Create and pack widgets
+    main_frame = ttk.Frame(root, padding="20")
+    main_frame.pack(fill=tk.BOTH, expand=True)
+
+    # Length input
+    length_label = ttk.Label(main_frame, text="Password Length (8-16):")
+    length_label.pack(pady=5)
+    
+    length_var = tk.StringVar(value="8")
+    length_entry = ttk.Entry(main_frame, textvariable=length_var, width=10, justify='center')
+    length_entry.pack(pady=5)
+
+    # Generate button
+    generate_button = ttk.Button(main_frame, text="Generate Password", command=generate)
+    generate_button.pack(pady=10)
+
+    # Password display
+    password_var = tk.StringVar()
+    password_entry = ttk.Entry(main_frame, textvariable=password_var, width=30, justify='center')
+    password_entry.pack(pady=10)
+
+    # Copy button
+    copy_button = ttk.Button(main_frame, text="Copy to Clipboard", command=copy_to_clipboard)
+    copy_button.pack(pady=5)
+
+    # Start the GUI event loop
+    root.mainloop()
 
 if __name__ == "__main__":
-    main()  
+    create_gui()  
